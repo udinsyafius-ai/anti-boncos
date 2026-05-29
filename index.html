@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Anti-Boncos</title>
+
+<style>
+body{
+margin:0;
+font-family:sans-serif;
+background: linear-gradient(135deg,#1e3c72,#2a5298);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+/* BOX LOGIN */
+.login-box{
+background:white;
+padding:30px;
+border-radius:12px;
+width:90%;
+max-width:350px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* TITLE */
+.title{
+font-size:20px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+/* INPUT */
+input{
+width:100%;
+padding:12px;
+border:1px solid #ccc;
+border-radius:6px;
+margin-bottom:15px;
+font-size:14px;
+}
+
+/* BUTTON */
+button{
+width:100%;
+padding:12px;
+background:#2a5298;
+color:white;
+border:none;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* LOADING */
+.loading{
+display:none;
+margin-top:15px;
+}
+
+.spinner{
+border:4px solid #eee;
+border-top:4px solid #2a5298;
+border-radius:50%;
+width:30px;
+height:30px;
+animation:spin 1s linear infinite;
+margin:0 auto;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+<div class="title">LOGIN Anti-Boncos</div>
+
+<input type="email" id="email" placeholder="Masukkan email kamu">
+
+<button onclick="login()">Login</button>
+
+<div class="loading" id="loading">
+<div class="spinner"></div>
+<p>Memproses...</p>
+</div>
+
+</div>
+
+<script>
+
+function getDeviceId(){
+let id = localStorage.getItem("deviceId");
+if(!id){
+id = "dev-" + Math.random().toString(36).substr(2,9);
+localStorage.setItem("deviceId", id);
+}
+return id;
+}
+
+function login(){
+
+const email = document.getElementById("email").value;
+
+if(!email){
+alert("Masukkan email dulu");
+return;
+}
+
+// tampilkan loading
+document.getElementById("loading").style.display = "block";
+
+const device = getDeviceId();
+const callbackName = "loginCallback";
+
+window[callbackName] = function(res){
+
+// sembunyikan loading
+document.getElementById("loading").style.display = "none";
+
+if(res.status === "success"){
+
+localStorage.setItem("isLoggedIn", "true");
+localStorage.setItem("email", email);
+localStorage.setItem("deviceId", device);
+
+// redirect ke app
+window.location.href = "/app";
+
+}else{
+alert(res.message);
+}
+
+}
+
+const script = document.createElement("script");
+script.src = "https://script.google.com/macros/s/AKfycbwE17hJ2mUeqBikmaKw8jV1crCViBCYhW1b8oovemFFi9gUKrGyCCgzyOIjT2bfluis/exec"
++ "?mode=login"
++ "&email=" + encodeURIComponent(email)
++ "&device=" + device
++ "&callback=" + callbackName;
+
+document.body.appendChild(script);
+
+}
+
+</script>
+
+</body>
+</html>
